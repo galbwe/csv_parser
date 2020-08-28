@@ -11,21 +11,21 @@ else:
 
 def serializedATN():
     with StringIO() as buf:
-        buf.write("\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3\7")
+        buf.write("\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3\b")
         buf.write("+\4\2\t\2\4\3\t\3\4\4\t\4\4\5\t\5\3\2\6\2\f\n\2\r\2\16")
         buf.write("\2\r\3\2\3\2\3\3\5\3\23\n\3\3\3\6\3\26\n\3\r\3\16\3\27")
         buf.write("\3\3\5\3\33\n\3\3\3\5\3\36\n\3\3\4\5\4!\n\4\3\4\5\4$\n")
-        buf.write("\4\3\4\5\4\'\n\4\3\5\3\5\3\5\2\2\6\2\4\6\b\2\3\3\2\3\4")
+        buf.write("\4\3\4\5\4\'\n\4\3\5\3\5\3\5\2\2\6\2\4\6\b\2\3\3\2\3\5")
         buf.write("\2.\2\13\3\2\2\2\4\25\3\2\2\2\6 \3\2\2\2\b(\3\2\2\2\n")
         buf.write("\f\5\4\3\2\13\n\3\2\2\2\f\r\3\2\2\2\r\13\3\2\2\2\r\16")
         buf.write("\3\2\2\2\16\17\3\2\2\2\17\20\7\2\2\3\20\3\3\2\2\2\21\23")
         buf.write("\5\6\4\2\22\21\3\2\2\2\22\23\3\2\2\2\23\24\3\2\2\2\24")
-        buf.write("\26\7\6\2\2\25\22\3\2\2\2\26\27\3\2\2\2\27\25\3\2\2\2")
+        buf.write("\26\7\7\2\2\25\22\3\2\2\2\26\27\3\2\2\2\27\25\3\2\2\2")
         buf.write("\27\30\3\2\2\2\30\32\3\2\2\2\31\33\5\6\4\2\32\31\3\2\2")
-        buf.write("\2\32\33\3\2\2\2\33\35\3\2\2\2\34\36\7\5\2\2\35\34\3\2")
-        buf.write("\2\2\35\36\3\2\2\2\36\5\3\2\2\2\37!\7\7\2\2 \37\3\2\2")
+        buf.write("\2\32\33\3\2\2\2\33\35\3\2\2\2\34\36\7\6\2\2\35\34\3\2")
+        buf.write("\2\2\35\36\3\2\2\2\36\5\3\2\2\2\37!\7\b\2\2 \37\3\2\2")
         buf.write("\2 !\3\2\2\2!#\3\2\2\2\"$\5\b\5\2#\"\3\2\2\2#$\3\2\2\2")
-        buf.write("$&\3\2\2\2%\'\7\7\2\2&%\3\2\2\2&\'\3\2\2\2\'\7\3\2\2\2")
+        buf.write("$&\3\2\2\2%\'\7\b\2\2&%\3\2\2\2&\'\3\2\2\2\'\7\3\2\2\2")
         buf.write("()\t\2\2\2)\t\3\2\2\2\n\r\22\27\32\35 #&")
         return buf.getvalue()
 
@@ -41,10 +41,10 @@ class CsvParser ( Parser ):
     sharedContextCache = PredictionContextCache()
 
     literalNames = [ "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
-                     "','" ]
+                     "<INVALID>", "','" ]
 
-    symbolicNames = [ "<INVALID>", "INTEGER", "FLOAT", "NEWLINE", "SEPARATOR", 
-                      "WHITESPACE" ]
+    symbolicNames = [ "<INVALID>", "INTEGER", "FLOAT", "STRING", "NEWLINE", 
+                      "SEPARATOR", "WHITESPACE" ]
 
     RULE_csv = 0
     RULE_line = 1
@@ -56,9 +56,10 @@ class CsvParser ( Parser ):
     EOF = Token.EOF
     INTEGER=1
     FLOAT=2
-    NEWLINE=3
-    SEPARATOR=4
-    WHITESPACE=5
+    STRING=3
+    NEWLINE=4
+    SEPARATOR=5
+    WHITESPACE=6
 
     def __init__(self, input:TokenStream, output:TextIO = sys.stdout):
         super().__init__(input, output)
@@ -115,7 +116,7 @@ class CsvParser ( Parser ):
                 self.state = 11 
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
-                if not ((((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << CsvParser.INTEGER) | (1 << CsvParser.FLOAT) | (1 << CsvParser.SEPARATOR) | (1 << CsvParser.WHITESPACE))) != 0)):
+                if not ((((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << CsvParser.INTEGER) | (1 << CsvParser.FLOAT) | (1 << CsvParser.STRING) | (1 << CsvParser.SEPARATOR) | (1 << CsvParser.WHITESPACE))) != 0)):
                     break
 
             self.state = 13
@@ -300,6 +301,9 @@ class CsvParser ( Parser ):
         def FLOAT(self):
             return self.getToken(CsvParser.FLOAT, 0)
 
+        def STRING(self):
+            return self.getToken(CsvParser.STRING, 0)
+
         def getRuleIndex(self):
             return CsvParser.RULE_field
 
@@ -323,7 +327,7 @@ class CsvParser ( Parser ):
             self.enterOuterAlt(localctx, 1)
             self.state = 38
             _la = self._input.LA(1)
-            if not(_la==CsvParser.INTEGER or _la==CsvParser.FLOAT):
+            if not((((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << CsvParser.INTEGER) | (1 << CsvParser.FLOAT) | (1 << CsvParser.STRING))) != 0)):
                 self._errHandler.recoverInline(self)
             else:
                 self._errHandler.reportMatch(self)

@@ -29,10 +29,25 @@ def test_parse_int_array(csv_data, expected):
     (
         "3.14, 2.159\n 4.00, 5.01",
         [[3.14, 2.159], [4.00, 5.01]]
-    )
+    ),
 ])
 def test_parse_float_array(csv_data, expected):
     assert parse(csv_data) == expected
+
+
+@pytest.mark.parametrize('csv_data, expected', [
+    (
+        '"a", "bb", "ccc"\n "d", "ee", "fff"',
+        [["a", "bb", "ccc"], ["d", "ee", "fff"]]
+    ),
+    (
+        "'a', 'bb', 'ccc'\n 'd', 'ee', 'fff'",
+        [["a", "bb", "ccc"], ["d", "ee", "fff"]]
+    ),
+])
+def test_parse_string_array(csv_data, expected):
+    assert parse(csv_data) == expected
+
 
 @pytest.mark.xfail
 def parse_empty_fields():

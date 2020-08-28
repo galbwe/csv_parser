@@ -17,6 +17,8 @@ class CsvToPythonListener(CsvListener):
             entry = int(ctx.INTEGER().getText())
         elif ctx.FLOAT():
             entry = float(ctx.FLOAT().getText())
+        elif ctx.STRING():
+            entry = ctx.STRING().getText()[1:-1]
         else:
             raise TypeError('Could not determine type for field.')
         self.output[-1].append(entry)

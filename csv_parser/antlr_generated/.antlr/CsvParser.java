@@ -16,7 +16,7 @@ public class CsvParser extends Parser {
 	protected static final PredictionContextCache _sharedContextCache =
 		new PredictionContextCache();
 	public static final int
-		INTEGER=1, FLOAT=2, NEWLINE=3, SEPARATOR=4, WHITESPACE=5;
+		INTEGER=1, FLOAT=2, STRING=3, NEWLINE=4, SEPARATOR=5, WHITESPACE=6;
 	public static final int
 		RULE_csv = 0, RULE_line = 1, RULE_cell = 2, RULE_field = 3;
 	private static String[] makeRuleNames() {
@@ -28,13 +28,13 @@ public class CsvParser extends Parser {
 
 	private static String[] makeLiteralNames() {
 		return new String[] {
-			null, null, null, null, "','"
+			null, null, null, null, null, "','"
 		};
 	}
 	private static final String[] _LITERAL_NAMES = makeLiteralNames();
 	private static String[] makeSymbolicNames() {
 		return new String[] {
-			null, "INTEGER", "FLOAT", "NEWLINE", "SEPARATOR", "WHITESPACE"
+			null, "INTEGER", "FLOAT", "STRING", "NEWLINE", "SEPARATOR", "WHITESPACE"
 		};
 	}
 	private static final String[] _SYMBOLIC_NAMES = makeSymbolicNames();
@@ -122,7 +122,7 @@ public class CsvParser extends Parser {
 				setState(11); 
 				_errHandler.sync(this);
 				_la = _input.LA(1);
-			} while ( (((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << INTEGER) | (1L << FLOAT) | (1L << SEPARATOR) | (1L << WHITESPACE))) != 0) );
+			} while ( (((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << INTEGER) | (1L << FLOAT) | (1L << STRING) | (1L << SEPARATOR) | (1L << WHITESPACE))) != 0) );
 			setState(13);
 			match(EOF);
 			}
@@ -293,6 +293,7 @@ public class CsvParser extends Parser {
 	public static class FieldContext extends ParserRuleContext {
 		public TerminalNode INTEGER() { return getToken(CsvParser.INTEGER, 0); }
 		public TerminalNode FLOAT() { return getToken(CsvParser.FLOAT, 0); }
+		public TerminalNode STRING() { return getToken(CsvParser.STRING, 0); }
 		public FieldContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -308,7 +309,7 @@ public class CsvParser extends Parser {
 			{
 			setState(38);
 			_la = _input.LA(1);
-			if ( !(_la==INTEGER || _la==FLOAT) ) {
+			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << INTEGER) | (1L << FLOAT) | (1L << STRING))) != 0)) ) {
 			_errHandler.recoverInline(this);
 			}
 			else {
@@ -330,18 +331,18 @@ public class CsvParser extends Parser {
 	}
 
 	public static final String _serializedATN =
-		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3\7+\4\2\t\2\4\3\t"+
+		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3\b+\4\2\t\2\4\3\t"+
 		"\3\4\4\t\4\4\5\t\5\3\2\6\2\f\n\2\r\2\16\2\r\3\2\3\2\3\3\5\3\23\n\3\3\3"+
 		"\6\3\26\n\3\r\3\16\3\27\3\3\5\3\33\n\3\3\3\5\3\36\n\3\3\4\5\4!\n\4\3\4"+
-		"\5\4$\n\4\3\4\5\4\'\n\4\3\5\3\5\3\5\2\2\6\2\4\6\b\2\3\3\2\3\4\2.\2\13"+
+		"\5\4$\n\4\3\4\5\4\'\n\4\3\5\3\5\3\5\2\2\6\2\4\6\b\2\3\3\2\3\5\2.\2\13"+
 		"\3\2\2\2\4\25\3\2\2\2\6 \3\2\2\2\b(\3\2\2\2\n\f\5\4\3\2\13\n\3\2\2\2\f"+
 		"\r\3\2\2\2\r\13\3\2\2\2\r\16\3\2\2\2\16\17\3\2\2\2\17\20\7\2\2\3\20\3"+
 		"\3\2\2\2\21\23\5\6\4\2\22\21\3\2\2\2\22\23\3\2\2\2\23\24\3\2\2\2\24\26"+
-		"\7\6\2\2\25\22\3\2\2\2\26\27\3\2\2\2\27\25\3\2\2\2\27\30\3\2\2\2\30\32"+
+		"\7\7\2\2\25\22\3\2\2\2\26\27\3\2\2\2\27\25\3\2\2\2\27\30\3\2\2\2\30\32"+
 		"\3\2\2\2\31\33\5\6\4\2\32\31\3\2\2\2\32\33\3\2\2\2\33\35\3\2\2\2\34\36"+
-		"\7\5\2\2\35\34\3\2\2\2\35\36\3\2\2\2\36\5\3\2\2\2\37!\7\7\2\2 \37\3\2"+
+		"\7\6\2\2\35\34\3\2\2\2\35\36\3\2\2\2\36\5\3\2\2\2\37!\7\b\2\2 \37\3\2"+
 		"\2\2 !\3\2\2\2!#\3\2\2\2\"$\5\b\5\2#\"\3\2\2\2#$\3\2\2\2$&\3\2\2\2%\'"+
-		"\7\7\2\2&%\3\2\2\2&\'\3\2\2\2\'\7\3\2\2\2()\t\2\2\2)\t\3\2\2\2\n\r\22"+
+		"\7\b\2\2&%\3\2\2\2&\'\3\2\2\2\'\7\3\2\2\2()\t\2\2\2)\t\3\2\2\2\n\r\22"+
 		"\27\32\35 #&";
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
